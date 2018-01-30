@@ -113,7 +113,7 @@ def possible_address(string):
     return ADDRESS_RE.match(string)
 
 def hash_to_address(version, hash):
-    vh = version + hash
+    vh = "\x37" + hash
     return base58.b58encode(vh + double_sha256(vh)[:4])
 
 def decode_check_address(address):
