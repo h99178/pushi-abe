@@ -39,7 +39,7 @@ import base58
 
 __version__ = version.__version__
 
-ABE_APPNAME = "Abe"
+ABE_APPNAME = "Pushi"
 ABE_VERSION = __version__
 ABE_URL = 'https://github.com/bitcoin-abe/bitcoin-abe'
 
@@ -67,6 +67,42 @@ DEFAULT_TEMPLATE = """
      href="%(dotdot)s%(STATIC_PATH)sabe.css" />
     <link rel="shortcut icon" href="%(dotdot)s%(STATIC_PATH)sfavicon.ico" />
     <title>%(title)s</title>
+    
+    <style>
+      ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+            margin-bottom: 1em;
+            margin-top: 1em;
+
+        }
+        
+        li {
+            float: left;
+        }
+        
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 10px 12px;
+            text-decoration: none;
+        }
+        
+        /* Change the link color to #111 (black) on hover */
+        li a:hover {
+            background-color: grey;
+            color: black;
+        }
+        
+        li {
+            border-right: 1px solid #bbb;
+        }
+    </style>
+    
 </head>
 <body>
 <div class="container">
@@ -75,6 +111,14 @@ DEFAULT_TEMPLATE = """
     <h1><a href="%(dotdot)s%(HOMEPAGE)s"><img
      src="%(dotdot)s%(STATIC_PATH)slogo32.jpg" alt="PUSI logo" /></a>
     </h1>
+    
+    <ul class="menu">
+      <li><a href="/chain/Pushi">Explorer</a></li>
+      <li><a href="/masternodes">MasterNodes</a></li>
+      <li><a href="/governance">Governance</a></li>
+      <li><a href="http://forum.pushiplay.pw/" target="_blank" >Forum</a></li>
+    </ul>
+    
     %(body)s
     <p><a href="%(dotdot)sq">API</a> (machine-readable pages)</p>
     <p style="font-size: smaller">
@@ -292,6 +336,151 @@ class Abe:
 
     def get_handler(abe, cmd):
         return getattr(abe, 'handle_' + cmd, None)
+
+    def handle_masternodes(abe, page):
+        page['title'] = ABE_APPNAME + ' MasterNodes'
+        body = page['body']
+        body += """
+        <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.css"/>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"></script>
+
+        <table id="mn-table" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Protocol</th>
+                    <th>Payee</th>
+                    <th>Last Seen</th>
+                    <th>Active Time</th>
+                    <th>Last Paid Time</th>
+                    <th>Last Paid Block</th>
+                    <th>IP</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>Status</th>
+                    <th>Protocol</th>
+                    <th>Payee</th>
+                    <th>Last Seen</th>
+                    <th>Active Time</th>
+                    <th>Last Paid Time</th>
+                    <th>Last Paid Block</th>
+                    <th>IP</th>
+                </tr>
+            </tfoot>
+        </table>
+        <br><br>
+
+        <script>
+
+         $(document).ready(function() {
+            $('#mn-table').DataTable( {
+                "ajax": "data/mn.json",
+                "lengthMenu": [[50, 100, -1], [50, 100, "All"]]
+            } );
+        } );
+
+        </script>
+        """
+
+    def handle_governance(abe, page):
+        page['title'] = ABE_APPNAME + ' Governance'
+        body = page['body']
+        body += """
+        
+        <h1>Pushi Governance Proposals</h1>
+        <div id="data-panel" >
+        </div>
+        
+        <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"/>
+
+        
+        
+        
+        <script src="/tmpl.min.js"></script>
+        
+        <script type="text/x-tmpl" id="tmpl-demo">
+            {% if (o.index % 2 == 0) { %}
+                <div style="background-color: beige; padding: 1em;" >
+            {% } else { %}
+                <div style="background-color: aliceblue; padding: 1em;" >
+            {% } %}
+            
+                <h3>Name: {%=o.proposal.name%}</h3>
+                <p style="float: right;" >Creation Time: {%=o.CreationTime%} <br></p>
+                <p>Long description
+                <a href="{%=o.proposal.url%}" target="_blank" >{%=o.proposal.url%}</a>.</p>
+                <p>ID: {%=o.Hash%} <br>
+                <div id="{%=o.Hash%}" >
+                <h3>Proposal Details</h3>
+                    <div>
+                    <span style="font-size: 0.8em;color: grey;">
+                     Payment Address: {%=o.proposal.payment_address%}<br>
+                     Payment Amount: {%=o.proposal.payment_amount%} PUSHI<br>
+                     Start Epoch: {%=o.proposal.start_epoch%} <br> 
+                     End Epoch: {%=o.proposal.end_epoch%} <br> 
+                    </span>
+                    </div>
+                <h3>How Vote</h3>
+                    <div>
+                    At masternode control/local wallet enter one of the below commands. <br>
+                    <span style="font-size: 0.8em;color: blue;">
+                    gobject vote-many {%=o.Hash%} funding yes <br>
+                    gobject vote-many {%=o.Hash%} funding no <br>
+                    gobject vote-many {%=o.Hash%} funding abstain <br>
+                    </span>
+                    </div>
+                </div>
+                </p>
+                <h4>Absolute Yes: {%=o.AbsoluteYesCount%}
+                 <span style="font-size: 0.8em;color: blue;">
+                  (Yes: {%=o.YesCount%}, No: {%=o.NoCount%}, Abstain {%=o.AbstainCount%})
+                 </span>
+                 </h4>
+                 <p>
+                    Flags:
+                     <span style="font-size: 0.8em;color: grey;">
+                         Valid: {%=o.fCachedValid%},
+                         Funding: {%=o.fCachedFunding%},
+                         Delete: {%=o.fCachedDelete%},
+                         Blockchain Validity: {%=o.fBlockchainValidity%}
+                     </span>
+                 </p>
+                 
+            </div>
+        </script>
+        
+        <script>
+            //document.getElementById("result").innerHTML = tmpl("tmpl-demo", data);
+            
+            $( document ).ready(function() {
+                $.ajaxSetup({ cache: false });
+                
+                $.getJSON( "data/gov.json", function( data ) {
+                
+                  $.each(data, function( index, value ) {
+                      value.index = index;
+                      value.CreationTime = new Date(value.CreationTime * 1000).toISOString().replace("T", " ");
+                      value.proposal.start_epoch = new Date(value.proposal.start_epoch * 1000).toISOString().replace("T", " ");
+                      value.proposal.end_epoch = new Date(value.proposal.end_epoch * 1000).toISOString().replace("T", " ");
+                      $("#data-panel").append( tmpl("tmpl-demo", value) );
+                      $( "#"+value.Hash ).accordion({
+                            collapsible: true,
+                            active: false
+                        });
+                    });
+                    
+                });
+            });
+            
+        </script>
+        
+        """
 
     def handle_chains(abe, page):
         page['title'] = ABE_APPNAME + ' Search'

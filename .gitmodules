@@ -1,0 +1,3 @@
+[submodule "xcoin-hash"]
+	path = xcoin-hash
+	url = https://github.com/pushiplay/xcoin-hash
