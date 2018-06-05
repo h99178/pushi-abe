@@ -47,6 +47,8 @@ def dump_gov_info():
     result = []
     for k in mn.keys():
         cr_gob = mn[k]
+        if cr_gob["ObjectType"] != 1:
+            continue
         cr_prop = json.loads(cr_gob["DataString"])
         cr_prop = cr_prop[0][1]
         cr_gob["proposal"] = cr_prop

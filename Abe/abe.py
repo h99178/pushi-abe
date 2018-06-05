@@ -391,15 +391,34 @@ class Abe:
         body = page['body']
         body += """
         
-        <h1>Pushi Governance Proposals</h1>
-        <div id="data-panel" >
+        <h1>Pushi Governance Proposals 
+        <a target="_blank" href="https://docs.google.com/document/d/1i1nESvpoJ2wHh3xfZ-jRHgeU2R6YRIn5_KudNOivrsM" >(Guide)</a></h1>
+        
+        
+        
+        <div id="tabs" >
+          <ul>
+            <li><a href="#tabs-1">Funding</a></li>
+            <li><a href="#tabs-2">Not Funding Yet</a></li>
+          </ul>
+            <div id="tabs-1" class="active">
+            </div>
+            
+            <div id="tabs-2">
+            </div>
         </div>
         
-        <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
-        <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+        <script type="text/javascript" src="//code.jquery.com/jquery-1.12.4.js"></script>
+        <script type="text/javascript" src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
         <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"/>
 
-        
+        <script>
+          $( function() {
+            $( "#tabs" ).tabs();
+          } );
+        </script>
         
         
         <script src="/tmpl.min.js"></script>
@@ -463,15 +482,28 @@ class Abe:
                 
                 $.getJSON( "data/gov.json", function( data ) {
                 
+                  var tb1index = 0;
+                  var tb2index = 0;
                   $.each(data, function( index, value ) {
-                      value.index = index;
+                      
                       value.CreationTime = new Date(value.CreationTime * 1000).toISOString().replace("T", " ");
                       value.proposal.start_epoch = new Date(value.proposal.start_epoch * 1000).toISOString().replace("T", " ");
                       value.proposal.end_epoch = new Date(value.proposal.end_epoch * 1000).toISOString().replace("T", " ");
-                      $("#data-panel").append( tmpl("tmpl-demo", value) );
+                      
+                      if(value.fCachedFunding){
+                        tb1index = tb1index + 1;
+                        value.index = tb1index;
+                        $("#tabs-1").append( tmpl("tmpl-demo", value) );
+                      }else{
+                        tb2index = tb2index + 1;
+                        value.index = tb2index;
+                        $("#tabs-2").append( tmpl("tmpl-demo", value) );
+                      }
+                      
                       $( "#"+value.Hash ).accordion({
                             collapsible: true,
-                            active: false
+                            active: false,
+                            heightStyle: "content"
                         });
                     });
                     
