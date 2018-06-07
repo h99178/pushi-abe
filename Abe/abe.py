@@ -398,8 +398,8 @@ class Abe:
         
         <div id="tabs" >
           <ul>
-            <li><a href="#tabs-1">Funding</a></li>
-            <li><a href="#tabs-2">Not Funding Yet</a></li>
+            <li><a href="#tabs-1">Funding(More 10% Votes)</a></li>
+            <li><a href="#tabs-2">Not Funding Yet(Less 10% Votes)</a></li>
           </ul>
             <div id="tabs-1" class="active">
             </div>

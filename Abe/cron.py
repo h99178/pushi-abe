@@ -55,6 +55,7 @@ def dump_gov_info():
         del cr_gob["DataHex"]
         del cr_gob["DataString"]
         result.append(cr_gob)
+    result.sort(key=lambda x: x["CreationTime"], reverse=True)
     print(json.dumps(result))
 
 
